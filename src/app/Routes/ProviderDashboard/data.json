@@ -1,0 +1,64 @@
+{
+   "Services":[
+      {
+         "ServiceName":"Select your service ",
+         "Description":""
+      },
+      {
+         "ServiceName":"Conventional Oil Change",
+         "Description":"Includes draining and replacing the engine oil with conventional oil, changing the oil filter, and a basic vehicle inspection."
+      },
+      {
+         "ServiceName":"Synthetic Oil Change",
+         "Description":"Involves using synthetic motor oil for improved performance and protection, along with an oil filter replacement and vehicle inspection."
+      },
+      {
+         "ServiceName":"High-Mileage Oil Change",
+         "Description":"Designed for vehicles with higher mileage, it uses oil formulated to reduce wear and tear on older engines, includes an oil filter change, and vehicle inspection."
+      },
+      {
+         "ServiceName":"Full-Synthetic Oil Change",
+         "Description":"Utilizes premium full-synthetic oil for enhanced engine protection, includes an oil filter replacement, and a thorough vehicle inspection."
+      },
+      {
+         "ServiceName":"Filter Replacements (Air, Cabin Air, Fuel)",
+         "Description":"Separate service for replacing air filters, cabin air filters, and fuel filters as needed."
+      },
+      {
+         "ServiceName":"Brake Service",
+         "Description":"Comprehensive brake system maintenance, including brake pad replacement, brake fluid flush, and inspection."
+      },
+      {
+         "ServiceName":"Battery Service",
+         "Description":"Battery testing, cleaning, and replacement services as necessary."
+      },
+      {
+         "ServiceName":"Tire Replacement",
+         "Description":"Replacing worn-out tires with new ones, including tire installation, balancing, and alignment."
+      },
+      {
+         "ServiceName":"Flat Tire Replacement",
+         "Description":"Emergency service to replace a flat or damaged tire with a spare or a new tire."
+      },
+      {
+         "ServiceName":"Wiper Blade Replacement",
+         "Description":"Replacing worn-out wiper blades for improved visibility during rain or snow."
+      },
+      {
+         "ServiceName":"Light Bulb Replacement",
+         "Description":"Replacing malfunctioning or burnt-out exterior and interior light bulbs."
+      },
+      {
+         "ServiceName":"Diagnostic Scans",
+         "Description":"Using diagnostic tools to identify and report vehicle issues and warning codes."
+      },
+      {
+         "ServiceName":"Diesel Oil Change",
+         "Description":"Specialized oil change service for diesel-powered vehicles, including oil and filter replacement."
+      },
+      {
+         "ServiceName":"RV Oil Change",
+         "Description":"Oil change service tailored to recreational vehicles (RVs) and motorhomes, ensuring proper lubrication."
+      }
+   ]
+}

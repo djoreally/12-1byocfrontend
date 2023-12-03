@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Darker+Grotesque&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@900&display=swap");
+.heroSection {
+  background-image: url("https://i.ibb.co/HpZ40VF/Homepage-Model-Y-Global-Desktop.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 40rem;
+}
+body {
+  font-family: Avenir, "Helvetica Neue" sans-serif;
+  background-color: #f9fafb;
+}
+
+.maincolor {
+  color: #01acf1;
+}
+.mainbg {
+  background-color: #00adef;
+}
+.pricing_list {
+  font-weight: 500;
+  color: rgb(20, 18, 18);
+  text-transform: capitalize;
+}
+
+.hero {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 600;
+}
+.populartag {
+  background: radial-gradient(
+      50% 50% at 50% 50%,
+      rgba(1, 57, 255, 0.2) 0%,
+      rgba(0, 19, 85, 0) 100%
+    ),
+    linear-gradient(180deg, #3d0dfa 0%, rgba(176, 143, 143, 0.78) 100%);
+}
+.forminput {
+  border-radius: 8px;
+  background: #f8f8ff;
+  border: solid #e3e6e7;
+  border-radius: 8px;
+  padding-block: 13px;
+  box-shadow: 0px 0px 4px 1px rgba(228, 224, 224, 0.22);
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
