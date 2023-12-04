@@ -11,6 +11,7 @@ import Image from "next/image";
 import ForgotPng from "/public/forgotpass.png";
 import Done from "/public/done.gif";
 import PassSave from "/public/savepass.png";
+import Navbar from "@/app/Components/Navbar";
 
 export default function page() {
   const [email, setEmail] = useState();
@@ -139,7 +140,9 @@ export default function page() {
   };
 
   return (
-    <div className="mx-40 mt-20 max-sm:mx-2 max-sm:mt-1">
+    <div>
+      <Navbar />
+    <div className="mx-40 mt-20 max-sm:mx-2 max-sm:mt-1" style={{ marginTop: "8rem" }}>
       <Toaster position="top-center" reverseOrder={false} />
       {isSuccess ? (
         <div>
@@ -450,6 +453,7 @@ export default function page() {
           )}
         </div>
       )}
+    </div>
     </div>
   );
 }

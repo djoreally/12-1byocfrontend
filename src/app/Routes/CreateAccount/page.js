@@ -18,6 +18,8 @@ import Loader from "@/app/Components/Loader";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
 import LoginPageCar from "/public/login.png";
+import Navbar from "@/app/Components/Navbar";
+import { SocialIcon } from "react-social-icons";
 
 export default function page() {
   // state for handling form
@@ -69,7 +71,9 @@ export default function page() {
 
   return (
     // main div
-    <div className="mx-80 mt-20 max-sm:mx-3 max-sm:mt-1">
+    <div>
+      <Navbar />
+    <div className="mx-80 mt-20 max-sm:mx-3 max-sm:mt-1" style={{ marginTop: "8rem" }}>
       <Toaster />
       {/* if login successfull and then redirect into this page  */}
       {isSuccessful ? (
@@ -130,36 +134,6 @@ export default function page() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              {/* phone input and text */}
-              <div className=" flex items-center  justify-between">
-                <p className="text-[#7C7C8A] text-lg capitalize w-fit px-2 rounded-sm">
-                  Enter your Phone number
-                </p>
-              </div>
-              <input
-                type="number"
-                className="mb-6 w-full  forminput"
-                size="large"
-                placeholder="Enter your phone number"
-                prefix={<PhoneOutlined />}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-              <div className=" flex items-center  justify-between">
-                {/* account type input and text */}
-                <p className="text-[#7C7C8A] text-lg capitalize w-fit px-2 rounded-sm">
-                  Select your account type
-                </p>
-              </div>
-              <select
-                className="mb-6 w-full  forminput"
-                size="large"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value="customer">customer</option>
-                <option value="provider">provider</option>
-              </select>
               <div className=" flex items-center  justify-between">
                 <div>
                   {/* password  input and text */}
@@ -184,7 +158,7 @@ export default function page() {
               {/* signup action button */}
               <button
                 onClick={SubmitHandler}
-                className="m-auto block mt-10 bg-[#2E53FF] text-white w-full rounded-[8px] py-[13px] font-semibold"
+                className="m-auto block bg-[#2E53FF] text-white w-full rounded-[8px] py-[13px] font-semibold"
               >
                 Singup
               </button>
@@ -193,25 +167,23 @@ export default function page() {
                 <p className="text-center text-[#7C7C8A] text-[16px] mt-5 font-semibold">
                   Or connect with:
                 </p>
+                <div class="flex justify-center flex space-x-4 grid-rows-1 grid-flow-col">
+                      <SocialIcon url="https://google.com"/>
+                      <SocialIcon url="https://facebook.com" />
+                      <SocialIcon url="https://twitter.com" />
+                    </div>
               </div>
               {/* If user don't have account and then redirect to signup page if forgot password then reset password page by Nextjs Link */}
-              <div className="my-2 flex max-sm:flex-wrap max-sm:justify-center items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <p className="font-medium text-[#7C7C8A]">
-                    Already have an account?{" "}
-                  </p>
-                  <Link
-                    href="/Routes/CustomerLogin"
-                    className="text-sm hover:underline text-[#2E53FF] font-bold"
-                  >
-                    Login
-                  </Link>
-                </div>
-              </div>
+              <div className="my-2">
+                      <p className="text-center font-medium text-[#7C7C8A]">
+                        Already have account? <Link href="/Routes/CustomerLogin" className="text-sm hover:underline text-[#2E53FF] font-bold">Login</Link>
+                      </p>
+                  </div>
             </div>
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

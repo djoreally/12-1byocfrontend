@@ -47,7 +47,7 @@ export default function Navbar() {
             />
             
           </a>
-          <div className="flex md:order-2 ">
+          <div className="flex md:order-2 flex space-x-1">
             {isLogin ? (
               <Dropdown
                 inline
@@ -109,11 +109,22 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={() => router.push("/Routes/CustomerLogin")}
-                className="bg-blue-400 text-white font-semibold px-4 py-2 rounded-lg w-40 max-sm:w-20 hover:bg-blue-300 hover:outline"
+                className="bg-[#2E53FF] text-white font-semibold px-4 py-2 rounded-lg max-sm:w-20 hover:bg-blue-500 hover:outline"
               >
                 Login
               </button>
             )}
+            <button
+                onClick={() => router.push("/Routes/CreateAccount")}
+                className="bg-[#2E53FF] text-white font-semibold px-4 py-2 rounded-lg max-sm:w-20 hover:bg-blue-500 hover:outline"
+              >
+                Registration
+              </button>
+              <img
+              src="/user.png"
+              className="h-8"
+              alt="Flowbite Logo"
+            />
           </div>
           <div
             className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1 "
@@ -137,7 +148,7 @@ export default function Navbar() {
                 </li>
                 <li>
                   <Link
-                    href="/"
+                    href="/Routes/ServicePage"
                     className="block  text-gray-900 text-sm hover:text-red-600 duration-300"
                     aria-current="page"
                   >
@@ -156,7 +167,7 @@ export default function Navbar() {
 
                 <li>
                   <Link
-                    href="/"
+                    href="/Routes/Pricing"
                     className="block  text-gray-900 text-sm hover:text-red-600 duration-300"
                     aria-current="page"
                   >
