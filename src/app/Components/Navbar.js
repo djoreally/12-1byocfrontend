@@ -41,7 +41,7 @@ export default function Navbar() {
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <a href="/" className="flex items-center">
             <img
-              src="https://flowbite.com/docs/images/logo.svg"
+              src="https://bookyouroilchange.com/_next/image?url=%2Fimages%2Fheader%2Flogo.png&w=256&q=75"
               className="h-8"
               alt="Flowbite Logo"
             />

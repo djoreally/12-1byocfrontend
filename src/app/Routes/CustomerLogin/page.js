@@ -139,7 +139,7 @@ export default function page() {
                       <SocialIcon url="https://twitter.com" />
                     </div>
                   </div>
-                  {/* If user don't have account and then redirect to signup page if forgot password then reset password page by Nextjs Link */}
+                  {/* If user don't have account and then redirect to Sign uppage if forgot password then reset password page by Nextjs Link */}
                   <div className="my-2">
                       <p className="text-center font-medium text-[#7C7C8A]">
                         Do not have account? <Link href="/Routes/CreateAccount" className="text-sm hover:underline text-[#2E53FF] font-bold">Registration</Link>

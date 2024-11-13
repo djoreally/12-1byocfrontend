@@ -155,7 +155,7 @@ export default function page() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              {/* signup action button */}
+              {/* Sign upaction button */}
               <button
                 onClick={SubmitHandler}
                 className="m-auto block bg-[#2E53FF] text-white w-full rounded-[8px] py-[13px] font-semibold"
@@ -173,7 +173,7 @@ export default function page() {
                       <SocialIcon url="https://twitter.com" />
                     </div>
               </div>
-              {/* If user don't have account and then redirect to signup page if forgot password then reset password page by Nextjs Link */}
+              {/* If user don't have account and then redirect to Sign uppage if forgot password then reset password page by Nextjs Link */}
               <div className="my-2">
                       <p className="text-center font-medium text-[#7C7C8A]">
                         Already have account? <Link href="/Routes/CustomerLogin" className="text-sm hover:underline text-[#2E53FF] font-bold">Login</Link>
