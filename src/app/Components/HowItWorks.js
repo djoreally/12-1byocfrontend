@@ -14,7 +14,7 @@ export default function HowItWorks() {
   return (
     <div className="mt-20 mx-20 py-10 max-sm:mx-3 max-sm:py-2">
       <h1 className="text-3xl font-extrabold text-gray-600 text-center max-sm:text-2xl">
-        How Book your oil change Works
+        How Book Your Oil Change Works
       </h1>
       <div className="flex justify-around mt-10 gap-10  bg-white p-3 px-6 shadow rounded-md max-sm:block max-sm:">
         <Image src={SideImage} />
@@ -35,9 +35,8 @@ export default function HowItWorks() {
             Schedule an appointment
           </h1>
           <p className="mt-5 text-lg leading-10 text-gray-600">
-            Easily schedule an appointment right through your Openbay account.
-            All services booked through Openbay are backed by our Peace-of-Mind
-            Guarantee.
+          Our platform uses the customer's address or location to ensure they are within 
+          the service radius and provide accurate availability.
           </p>
         </div>
         <Image src={SideImage2} />
@@ -45,7 +44,7 @@ export default function HowItWorks() {
       {/* <Pricing /> */}
       <div className="bg-[#01acf1] py-10 max-sm:pb-5 mt-10 max-sm:mt-5 rounded-md shadow max-sm:py-1">
         <h1 className="font-extrabold text-center text-3xl mt-20 text-[#ffffff] max-sm:text-xl">
-          Become a part of book your oil change
+          User-Friendly Platform: With intuitive features for both the admin and customer.
         </h1>
         <div className="flex justify-around mt-20 max-sm:block max-sm:gap-5 max-sm:mt-10">
           <div className="bg-white w-96  rounded-md shadow p-4  max-sm:w-80 max-sm:m-auto ">
@@ -114,13 +113,13 @@ export default function HowItWorks() {
               className="text-sm capitalize"
               items={[
                 {
-                  title: "Singup as service provider",
+                  title: "Join Now as service provider",
                 },
                 {
-                  title: "List your service",
+                  title: "Select Your Services",
                 },
                 {
-                  title: "Get appointment",
+                  title: "Approve Or Decline Request",
                 },
               ]}
             />

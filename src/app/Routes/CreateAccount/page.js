@@ -160,7 +160,7 @@ export default function page() {
                 onClick={SubmitHandler}
                 className="m-auto block bg-[#2E53FF] text-white w-full rounded-[8px] py-[13px] font-semibold"
               >
-                Singup
+                Join Now
               </button>
               {/* social login icons */}
               <div>

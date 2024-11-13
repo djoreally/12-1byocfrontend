@@ -7,14 +7,14 @@ export default function Footer() {
         <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
           <div className="md:flex md:justify-between">
             <div className="mb-6 md:mb-0">
-              <a href="https://flowbite.com/" className="flex items-center">
+              <a href="https://innovale.co/" className="flex items-center">
                 <img
-                  src="https://flowbite.com/docs/images/logo.svg"
+                  src="https://innovarel.co/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo-light.32f7a719.webp&w=256&q=75"
                   className="h-8 mr-3"
-                  alt="FlowBite Logo"
+                  alt="Innovarel Logo"
                 />
                 <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-                  Flowbite
+                  Innovarel
                 </span>
               </a>
             </div>
@@ -25,39 +25,39 @@ export default function Footer() {
                 </h2>
                 <ul className="text-gray-500 dark:text-gray-400 font-medium">
                   <li className="mb-4">
-                    <a href="https://flowbite.com/" className="hover:underline">
-                      Flowbite
+                    <a href="https://bookyouroilchange.com/" className="hover:underline">
+                      BYOC
                     </a>
                   </li>
                   <li>
                     <a
-                      href="https://tailwindcss.com/"
+                      href="https://quicklubedata.com/"
                       className="hover:underline"
                     >
-                      Tailwind CSS
+                      Quick Lube Data
                     </a>
                   </li>
                 </ul>
               </div>
               <div>
                 <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
-                  Follow us
+                  Partners
                 </h2>
                 <ul className="text-gray-500 dark:text-gray-400 font-medium">
                   <li className="mb-4">
                     <a
-                      href="https://github.com/themesberg/flowbite"
+                      href="https://momsoilchange.com"
                       className="hover:underline "
                     >
-                      Github
+                      MOMS Oil Change
                     </a>
                   </li>
                   <li>
                     <a
-                      href="https://discord.gg/4eeurUVvTy"
+                      href="https://cruzenapp.com/"
                       className="hover:underline"
                     >
-                      Discord
+                      Roadside Assistance
                     </a>
                   </li>
                 </ul>
@@ -85,8 +85,8 @@ export default function Footer() {
           <div className="sm:flex sm:items-center sm:justify-between">
             <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
               © 2023{" "}
-              <a href="https://flowbite.com/" className="hover:underline">
-                Flowbite™
+              <a href="https://bookyouroilchange.com/" className="hover:underline">
+                Innovarel™
               </a>
               . All Rights Reserved.
             </span>
