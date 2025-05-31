@@ -7,17 +7,66 @@ import { useDataContext } from "@/Contextapi";
 import { Drawer } from "antd";
 import { Accordion } from "flowbite-react";
 import Navbar from "../navbar";
+import ChecklistComponent from "@/app/Components/ProviderDashboard/ChecklistComponent";
+import MapView from "@/app/Components/ProviderDashboard/MapView";
+import RouteToCustomer from "@/app/Components/ProviderDashboard/RouteToCustomer";
+
+const defaultChecklistItems = [
+  { id: '1', label: 'Perform pre-service inspection (check for existing damage, note mileage)', checked: false },
+  { id: '2', label: 'Verify correct oil and filter for vehicle', checked: false },
+  { id: '3', label: 'Drain old oil completely', checked: false },
+  { id: '4', label: 'Replace oil filter', checked: false },
+  { id: '5', label: 'Add new oil to correct level', checked: false },
+  { id: '6', label: 'Check and top-up other fluids (washer, coolant if applicable)', checked: false },
+  { id: '7', label: 'Inspect tire pressure and condition', checked: false },
+  { id: '8', label: 'Reset oil life monitor / service light', checked: false },
+  { id: '9', label: 'Clean up work area and vehicle (no oil spills, handprints)', checked: false },
+  { id: '10', label: 'Record service details and provide receipt/sticker', checked: false },
+];
 
 export default function page() {
   const {data} = useDataContext();
-  const [bookingdata, setBookingdata] = useState();
+  const [bookingdata, setBookingdata] = useState(null);
   const [open, setOpen] = useState(false);
-  const showDrawer = () => {
+  // jobStatusMap will store status for each booking: 'not_started', 'started', 'completed'
+  const [jobStatusMap, setJobStatusMap] = useState({});
+
+  const showDrawer = (currentBookingData) => {
+    setBookingdata(currentBookingData);
+    setJobStatusMap(prevMap => ({
+      ...prevMap,
+      [currentBookingData._id]: prevMap[currentBookingData._id] || 'not_started'
+    }));
     setOpen(true);
   };
+
   const onClose = () => {
     setOpen(false);
+    // Optionally reset current bookingdata if needed, or leave as is
+    // setBookingdata(null);
   };
+
+  const handleStartJob = () => {
+    if (bookingdata) {
+      console.log(`Job started: ${bookingdata._id}`);
+      setJobStatusMap(prevMap => ({
+        ...prevMap,
+        [bookingdata._id]: 'started'
+      }));
+    }
+  };
+
+  const handleCompleteJob = () => {
+    if (bookingdata) {
+      console.log(`Job completed: ${bookingdata._id}`);
+      setJobStatusMap(prevMap => ({
+        ...prevMap,
+        [bookingdata._id]: 'completed'
+      }));
+    }
+  };
+
+  const currentJobStatus = bookingdata ? jobStatusMap[bookingdata._id] : 'not_started';
 
   const drawerStyle = {
     background: "#eef2f5",
@@ -142,7 +191,7 @@ export default function page() {
                 </div>
                 <button
                   onClick={() => {
-                    showDrawer(), setBookingdata(data);
+                    showDrawer(data); // Pass the specific booking data to showDrawer
                   }}
                   className="m-auto mb-0 mr-0 block capitalize font-medium text-blue-500 px-4 hover:bg-blue-100 duration-200 rounded-sm"
                 >
@@ -210,6 +259,17 @@ export default function page() {
             <hr className="mb-3" />
             <div className="flex justify-between e ">
               <div className="capitalize text-sm text-gray-700 font-medium">
+                {/* Placeholder for MapView and RouteToCustomer - ideally pass relevant location props */}
+                <MapView
+                  customerLocation={bookingdata?.Location && bookingdata.Location.length > 0 ?
+                    { address: `${bookingdata.street}, ${bookingdata.Location[0].city}, ${bookingdata.Location[0].postal_code}` } :
+                    null}
+                />
+                <RouteToCustomer
+                  destinationAddress={bookingdata?.Location && bookingdata.Location.length > 0 ?
+                    `${bookingdata.street}, ${bookingdata.Location[0].city}, ${bookingdata.Location[0].postal_code}` :
+                    null}
+                />
                 <p>
                   {" "}
                   <strong className="text-gray-900">postal code : </strong>{" "}
@@ -478,6 +538,13 @@ export default function page() {
           </div>
         </div>
 
+        {/* Checklist Component Integration */}
+        {bookingdata && (
+          <div className="my-4 p-4 bg-white rounded-lg shadow-sm">
+            <ChecklistComponent items={defaultChecklistItems} bookingId={bookingdata._id} />
+          </div>
+        )}
+
         <div>
           <div className="grid grid-cols-6 bg-white my-1 gap-x-6 px-2 p-4 rounded-lg ">
             <div className="col-span-2 flex items-center gap-2  text-gray-600 uppercase  font-bold  rounded-sm px-2">
@@ -610,6 +677,34 @@ export default function page() {
             </svg>
             reschedule
           </button>
+          {/* Job Action Buttons */}
+          {bookingdata && (
+            <div className="mt-6 pt-4 border-t border-gray-300">
+              {currentJobStatus === 'not_started' && (
+                <button
+                  onClick={handleStartJob}
+                  className="w-full uppercase font-semibold text-white bg-blue-500 hover:bg-blue-600 p-2 rounded-sm flex items-center justify-center gap-2 mb-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" /></svg>
+                  Start Job
+                </button>
+              )}
+              {currentJobStatus === 'started' && (
+                <button
+                  onClick={handleCompleteJob}
+                  className="w-full uppercase font-semibold text-white bg-green-500 hover:bg-green-600 p-2 rounded-sm flex items-center justify-center gap-2 mb-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Complete Job
+                </button>
+              )}
+              {currentJobStatus === 'completed' && (
+                 <p className="text-center text-gray-700 font-semibold p-2 bg-gray-200 rounded-sm">Job Completed</p>
+              )}
+            </div>
+          )}
+          {/* End Job Action Buttons */}
+
           <button className="uppercase font-semibold text-white bg-red-600 p-2 rounded-sm flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
