@@ -361,7 +361,15 @@ export default function page() {
           }
           // else keep default hours
 
-          setServices(data?.Services || []);
+          // Convert services from backend to include a unique 'id' if not present, for local state keying
+          const servicesWithId = data?.Services?.map((s, index) => ({
+            id: s.id || s._id || `service_loaded_${index}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Ensure unique ID
+            name: s.service || s.name,
+            description: s.serviceDescription || s.description,
+            price: s.price,
+            duration: s.duration || "N/A"
+          })) || [];
+          setServices(servicesWithId);
         }
       } catch (error) {
         console.log(error.message);
@@ -375,8 +383,8 @@ export default function page() {
     <div className="mx-40 my-20 max-sm:m-5 max-sm:mx-5">
       <Toaster />
       {loading ? (
-        <div class="fixed top-0 bottom-0 left-0 right-0 flex justify-center items-center bg-black bg-opacity-50">
-          <div role="status" class="loader">
+        <div className="fixed top-0 bottom-0 left-0 right-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div role="status" className="loader">
             <svg
               aria-hidden="true"
               class="w-[100px] h-[100px] mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
@@ -705,75 +713,119 @@ export default function page() {
                <h3 className="text-xl font-semibold mb-6 border-b pb-3">Define Your Services</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                 <div className="md:col-span-1">
-                  <div className="bg-gray-50 p-6 rounded-lg border">
-                    <p className="text-sm font-medium text-gray-700 mb-1">Select Service Name</p>
-                    <select
-                      className="my-2 w-full outline-0 py-2 px-3 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
-                      value={service}
-                      onChange={(e) => {
-                        setService(e.target.value);
-                        handleDescription(e); // This sets serviceDescription based on selection
-                      }}
-                    >
-                      <option value="">-- Select a service --</option>
-                      {Data?.Services?.map((s, index) => (
-                        <option key={index} value={s?.ServiceName} className="bg-white">
-                          {s?.ServiceName}
-                        </option>
-                      ))}
-                    </select>
+                    <div id="service-form-section" className="bg-gray-50 p-6 rounded-lg border">
+                      <h4 className="text-lg font-semibold mb-3">{currentServiceId ? "Edit Service" : "Add New Service"}</h4>
 
-                    <p className="text-sm font-medium text-gray-700 mt-3 mb-1">Service Description (auto-filled)</p>
-                    <textarea
-                      className="my-2 w-full text-gray-600 outline-0 py-2 px-3 rounded-lg border border-gray-300 bg-gray-100"
-                      rows="3"
-                      value={serviceDescription}
-                      readOnly
-                    />
+                      {/* Service Name (from dropdown) */}
+                      <div className="mb-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Service Name <span className="text-red-500">*</span></label>
+                        <select
+                          id="serviceNameSelect"
+                          className={`my-1 w-full outline-0 py-2 px-3 rounded-lg border ${serviceErrors.name ? 'border-red-500' : 'border-gray-300'} focus:ring-indigo-500 focus:border-indigo-500`}
+                          value={currentServiceName} // Controlled component
+                          onChange={(e) => handleSelectServiceDescription(e.target.value)}
+                        >
+                          <option value="">-- Select a service --</option>
+                          {Data?.Services?.map((s_data, index) => (
+                            <option key={index} value={s_data?.ServiceName} className="bg-white">
+                              {s_data?.ServiceName}
+                            </option>
+                          ))}
+                        </select>
+                        {serviceErrors.name && <p className="text-xs text-red-500 mt-1">{serviceErrors.name}</p>}
+                      </div>
 
-                    <p className="text-sm font-medium text-gray-700 mt-3 mb-1">Price ($)</p>
-                    <input
-                      name="price"
-                      type="number"
-                      className="my-2 w-full outline-0 py-2 px-3 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="Enter price"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                    />
-                    <br />
-                    <button
-                      onClick={addItem}
-                      className="text-sm bg-blue-500 hover:bg-blue-600 w-full text-white px-3 py-2 mt-4 rounded-lg shadow"
-                    >
-                      Add Service to List
-                    </button>
-                  </div>
+                      {/* Service Description (auto-filled) */}
+                      <div className="mb-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Service Description</label>
+                        <textarea
+                          className="my-1 w-full text-gray-600 outline-0 py-2 px-3 rounded-lg border border-gray-300 bg-gray-100"
+                          rows="3"
+                          value={currentServiceDescription} // Controlled component
+                          readOnly
+                        />
+                      </div>
+
+                      {/* Price */}
+                      <div className="mb-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Price ($) <span className="text-red-500">*</span></label>
+                        <input
+                          type="number"
+                          className={`my-1 w-full outline-0 py-2 px-3 rounded-lg border ${serviceErrors.price ? 'border-red-500' : 'border-gray-300'} focus:ring-indigo-500 focus:border-indigo-500`}
+                          placeholder="Enter price"
+                          value={currentServicePrice} // Controlled component
+                          onChange={(e) => setCurrentServicePrice(e.target.value)}
+                        />
+                        {serviceErrors.price && <p className="text-xs text-red-500 mt-1">{serviceErrors.price}</p>}
+                      </div>
+
+                      {/* Duration */}
+                      <div className="mb-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Duration (e.g., 30 mins, 1 hour, N/A)</label>
+                        <input
+                          type="text"
+                          className={`my-1 w-full outline-0 py-2 px-3 rounded-lg border ${serviceErrors.duration ? 'border-red-500' : 'border-gray-300'} focus:ring-indigo-500 focus:border-indigo-500`}
+                          placeholder="e.g., 45 mins or N/A"
+                          value={currentServiceDuration} // Controlled component
+                          onChange={(e) => setCurrentServiceDuration(e.target.value)}
+                        />
+                        {serviceErrors.duration && <p className="text-xs text-red-500 mt-1">{serviceErrors.duration}</p>}
+                      </div>
+
+                      <div className="flex space-x-2 mt-4">
+                        <button
+                          onClick={handleAddOrUpdateService}
+                          className="text-sm bg-blue-500 hover:bg-blue-600 flex-1 text-white px-3 py-2 rounded-lg shadow"
+                        >
+                          {currentServiceId ? "Update Service" : "Add Service to List"}
+                        </button>
+                        {currentServiceId && (
+                          <button
+                            onClick={resetServiceForm}
+                            type="button"
+                            className="text-sm bg-gray-300 hover:bg-gray-400 flex-1 text-gray-800 px-3 py-2 rounded-lg shadow"
+                          >
+                            Cancel Edit
+                          </button>
+                        )}
+                      </div>
+                    </div>
                 </div>
 
                 <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[500px] p-2 bg-gray-50 rounded-lg border">
                   {Services.length === 0 && <p className="text-gray-500 text-center col-span-full py-10">No services added yet.</p>}
-                  {Services.map((data, index) => (
-                    <div key={index} className="bg-white p-4 rounded-lg shadow border">
-                      <p className="text-md font-semibold flex items-center gap-2 text-gray-800">
-                        <AiFillShop className="w-5 h-5 text-blue-500" />
-                        {data.service}
-                      </p>
-                      <p className="text-xs text-gray-600 mt-1 mb-2 h-16 overflow-y-auto"> {/* Fixed height for description */}
-                        {data.serviceDescription}
-                      </p>
-                      <p className="text-md font-semibold flex items-center gap-1 text-gray-800">
-                        <AiFillDollarCircle className="w-5 h-5 text-green-500" />
-                        {data.price}$
-                      </p>
-                      <button
-                        className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 mt-3 rounded-md shadow w-full"
-                        onClick={() => {
-                          deleteItem(index);
-                          // handleFormSubmit(); // Consider if auto-submit on delete is desired here
-                        }}
-                      >
-                        Delete
-                      </button>
+                  {Services.map((s_item) => (
+                    <div key={s_item.id} className="bg-white p-4 rounded-lg shadow border flex flex-col justify-between">
+                      <div>
+                        <p className="text-md font-semibold flex items-center gap-2 text-gray-800">
+                          <AiFillShop className="w-5 h-5 text-blue-500" />
+                          {s_item.name}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1 mb-2 h-16 overflow-y-auto">
+                          {s_item.description}
+                        </p>
+                        <p className="text-sm font-semibold text-gray-700">
+                          Duration: {s_item.duration}
+                        </p>
+                        <p className="text-md font-semibold flex items-center gap-1 text-gray-800 mt-1">
+                          <AiFillDollarCircle className="w-5 h-5 text-green-500" />
+                          {s_item.price}$
+                        </p>
+                      </div>
+                      <div className="flex space-x-2 mt-3">
+                        <button
+                          className="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md shadow flex-1"
+                          onClick={() => handleEditService(s_item)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md shadow flex-1"
+                          onClick={() => handleDeleteService(s_item.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1338,34 +1390,42 @@ export default function page() {
                     </div>
                   </div>
 
-                  <div className="col-span-2 max-sm:col-span-1 grid grid-cols-2 max-sm:grid-cols-1 gap-2  overflow-scroll">
-                    {Services.map((data, index) => {
-                      return (
-                        <div key={index}>
-                          <div className="bg-white p-6 col-span-1  rounded-sm">
-                            <p className="text-lg font-medium flex items-center gap-1 text-gray-600">
-                              <AiFillShop className="w-6 h-6 text-blue-400" />
-                              {data.service}
-                            </p>{" "}
-                            <p className="text-sm  flex items-center gap-1 text-gray-700 ">
-                              {data.serviceDescription}
-                            </p>{" "}
-                            <p className="text-sm flex items-center gap-1">
-                              <AiFillDollarCircle className="w-6 h-6 text-blue-400" />
-                              {data.price}$
-                            </p>
-                            <button
-                              className="text-sm bg-[#E70404] text-white px-2 py-2 mt-5 rounded-sm w-full"
-                              onClick={() => {
-                                deleteItem(index), handleFormSubmit();
-                              }}
-                            >
-                              Delete
-                            </button>
-                          </div>
+                  <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[500px] p-2 bg-gray-50 rounded-lg border">
+                    {Services.length === 0 && <p className="text-gray-500 text-center col-span-full py-10">No services added yet.</p>}
+                    {Services.map((s_item) => (
+                      <div key={s_item.id} className="bg-white p-4 rounded-lg shadow border flex flex-col justify-between">
+                        <div>
+                          <p className="text-md font-semibold flex items-center gap-2 text-gray-800">
+                            <AiFillShop className="w-5 h-5 text-blue-500" />
+                            {s_item.name}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-1 mb-2 h-16 overflow-y-auto">
+                            {s_item.description}
+                          </p>
+                          <p className="text-sm font-semibold text-gray-700">
+                            Duration: {s_item.duration}
+                          </p>
+                          <p className="text-md font-semibold flex items-center gap-1 text-gray-800 mt-1">
+                            <AiFillDollarCircle className="w-5 h-5 text-green-500" />
+                            {s_item.price}$
+                          </p>
                         </div>
-                      );
-                    })}
+                        <div className="flex space-x-2 mt-3">
+                          <button
+                            className="text-xs bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md shadow flex-1"
+                            onClick={() => handleEditService(s_item)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md shadow flex-1"
+                            onClick={() => handleDeleteService(s_item.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
