@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import InventoryTracker from '@/app/Components/ProviderDashboard/InventoryTracker';
-import Navbar from '../../navbar'; // Assuming navbar is in ../../ from Inventory/page.js
+import Navbar from '../navbar'; // Corrected path
 // Sidebar would typically be part of a shared layout for the dashboard routes.
 // For now, this page will render Navbar and InventoryTracker.
 

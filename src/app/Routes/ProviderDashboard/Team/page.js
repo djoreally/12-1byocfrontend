@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import TeamManager from '@/app/Components/ProviderDashboard/TeamManager';
-import Navbar from '../../navbar'; // Assuming navbar is in ../../ from Team/page.js
+import Navbar from '../navbar'; // Corrected path
 
 export default function TeamPage() {
   return (

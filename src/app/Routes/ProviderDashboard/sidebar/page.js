@@ -9,17 +9,11 @@ import {
   AiFillAppstore,
   AiFillBell,
   AiOutlineHistory,
-  AiFillAppstore,
-  AiFillBell,
-  AiOutlineHistory,
-  AiFillAppstore,
-  AiFillBell,
-  AiOutlineHistory,
   AiFillRead,
   AiFillSnippets,
   AiFillSmile,
   AiFillShop,
-  AiOutlineTeam, // Added for Team Management icon
+  AiOutlineTeam,
 } from "react-icons/ai";
 import { FiPackage } from "react-icons/fi"; // Added for Inventory icon
 import { UserOutlined } from "@ant-design/icons";
