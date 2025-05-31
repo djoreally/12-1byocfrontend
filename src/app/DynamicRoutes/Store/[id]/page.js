@@ -126,28 +126,54 @@ export default function StoreDetailPage() {
       return;
     }
 
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      console.log("Fetching provider details for ID:", storeId, "API Endpoint: /api/provider/business/" + storeId + " (GET) - SIMULATED");
+    // New simulated fetch logic
+    console.log("Fetching details for provider ID:", storeId);
+    console.log(`Simulating API Call: GET /api/provider/business/${storeId}`);
+    setLoading(true);
+    setError(null); // Clear previous errors
 
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const profile = mockProviderProfiles[storeId];
-
-      if (profile) {
-        console.log("Mock API Response for provider " + storeId + ":", profile);
-        setStoreData(profile);
-      } else {
-        console.log("Mock API Response for provider " + storeId + ": Not Found");
-        setError("Provider not found.");
-        setStoreData(null);
+    new Promise(resolve => {
+      setTimeout(() => {
+        const profile = mockProviderProfiles[storeId];
+        if (profile) {
+          resolve({ ok: true, json: () => Promise.resolve(profile) });
+        } else {
+          resolve({ ok: false, status: 404, json: () => Promise.resolve({ message: "Provider not found (simulated)" }) });
+        }
+      }, 500);
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => {
+            console.error("Simulated API Error:", err.message);
+            setError(err.message || "Failed to fetch provider details (simulated error).");
+            setStoreData(null);
+            // setLoading(false); // setLoading will be handled in .finally()
+            return Promise.reject(err); // Propagate error to be caught by .catch if needed, or just return to stop chain
+        });
       }
+      return response.json();
+    })
+    .then(data => {
+      // This block will only be executed if response.ok was true and response.json() succeeded
+      if (data) {
+        console.log("Simulated API Success. Provider details:", data);
+        setStoreData(data);
+        setError(null);
+      }
+    })
+    .catch(error => {
+      // This catches errors from the Promise structure itself or if Promise.reject was used.
+      console.error("Error during simulated fetch for provider details:", error);
+      // If error came from response.json().then(err => Promise.reject(err)), 'error' here will be 'err'
+      if (!error.message.includes("Failed to fetch provider details")) { // Avoid double logging if already handled
+          setError(error.message || "Failed to fetch provider details (simulated catch).");
+      }
+      setStoreData(null);
+    })
+    .finally(() => {
       setLoading(false);
-    };
-
-    fetchData();
+    });
   }, [storeId]);
 
   if (loading) {
