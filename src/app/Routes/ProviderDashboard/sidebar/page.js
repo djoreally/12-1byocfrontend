@@ -13,7 +13,9 @@ import {
   AiFillSnippets,
   AiFillSmile,
   AiFillShop,
+  AiOutlineTeam,
 } from "react-icons/ai";
+import { FiPackage } from "react-icons/fi"; // Added for Inventory icon
 import { UserOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import jwtDecode from "jwt-decode";
@@ -93,10 +95,35 @@ export default function page() {
               </Link>
               <hr />
               <Link
+                href="Inventory"
+                className="flex items-center p-2 text-gray-700 rounded-lg  hover:bg-blue-200    group focus:bg-blue-100 "
+              >
+                <FiPackage />
+                <span className=" ml-2 text">Inventory</span>{" "}
+              </Link>
+              <hr />
+              <Link
+                href="Team"
+                className="flex items-center p-2 text-gray-700 rounded-lg  hover:bg-blue-200    group focus:bg-blue-100 "
+              >
+                <AiOutlineTeam />
+                <span className=" ml-2 text">Team Management</span>{" "}
+              </Link>
+              <hr />
+              <Link
+                href="Clients"
+                className="flex items-center p-2 text-gray-700 rounded-lg  hover:bg-blue-200    group focus:bg-blue-100 "
+              >
+                <AiFillSmile /> {/* Using AiFillSmile as it was previously noted for 'Customer manage' */}
+                <span className=" ml-2 text">Clients</span>{" "}
+              </Link>
+              <hr />
+              {/* The mt-20 class on the next link seems like a large gap, might want to review later if this was intentional for specific spacing */}
+              <Link
                 href="BookingHistory"
                 className="flex mt-20 items-center p-2 text-gray-700 rounded-lg  hover:bg-blue-200    group focus:bg-blue-100 "
               >
-                <AiFillSmile />
+                <AiFillSmile /> {/* This was the original "Customer manage" link, now potentially redundant or could be renamed/removed if "Clients" covers it */}
                 <span className=" ml-2 text">Customer manage</span>{" "}
               </Link>
               <hr />
