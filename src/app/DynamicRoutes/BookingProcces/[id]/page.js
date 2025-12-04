@@ -319,6 +319,9 @@ export default function Page({ params }) {
                           </Accordion.Title>
                           <Accordion.Content>
                             <div className="p-4 ">
+                              <p className="text-sm text-red-500 font-semibold mb-4">
+                                If you don't see your vehicle, please call us or send us a message.
+                              </p>
                               <p className="mt-2 font-medium capitalize">
                                 Select year
                               </p>
