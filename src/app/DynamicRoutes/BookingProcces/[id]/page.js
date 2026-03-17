@@ -210,7 +210,8 @@ export default function Page({ params }) {
       toast.error("Please select at least one service.");
       return;
     }
-    if (!zipcode || !zipcode.city || !zipcode.state || !street) {
+    const trimmedStreet = street.trim();
+    if (!zipcode || !zipcode.city || !zipcode.state || !trimmedStreet) {
       toast.error("Please enter a valid address before booking.");
       return;
     }
@@ -225,18 +226,39 @@ export default function Page({ params }) {
     // Recompute total price at submit time to avoid stale state
     const finalPrice = computeServiceTotal(selectedService, Vehicle.length) + SERVICE_CHARGE;
 
+    // Normalize payload — strip extra fields to send only what the backend needs
+    const normalizedVehicle = Vehicle.map(({ Year, Make, Model, Engine }) => ({
+      Year,
+      Make,
+      Model,
+      Engine,
+    }));
+
+    const normalizedServices = selectedService.map(({ _id, service, price }) => ({
+      _id,
+      service,
+      price,
+    }));
+
+    const normalizedLocation = {
+      city: zipcode.city,
+      state: zipcode.state,
+      postal_code: zipcode.postal_code,
+      country_code: zipcode.country_code,
+    };
+
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
       await api.post(`/Book/CreateBooking`, {
         TotalPrice: finalPrice,
-        Vehicle,
+        Vehicle: normalizedVehicle,
         Date: bookingDate,
         Time,
-        selectedService,
-        Location: zipcode,
-        apt,
-        street,
+        selectedService: normalizedServices,
+        Location: normalizedLocation,
+        apt: apt.trim(),
+        street: trimmedStreet,
         storeId: Data._id,
       });
       setBookingDone(true);
