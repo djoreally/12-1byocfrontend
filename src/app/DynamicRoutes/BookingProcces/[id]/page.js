@@ -35,9 +35,18 @@ import { Select } from "antd";
 import Empty from "/public/empty.png";
 import { AiFillDollarCircle, AiFillShop } from "react-icons/ai";
 import { Calendar } from "antd";
+import dayjs from "dayjs";
 import Loader from "@/app/Components/Loader";
 import { useRouter } from "next/navigation";
 import cars from "./csvjson.json";
+
+const computeServiceTotal = (services, vehicleCount) => {
+  let total = 0;
+  services.forEach((data) => {
+    total += (parseFloat(data?.price) || 0) * vehicleCount;
+  });
+  return total;
+};
 
 export default function Page({ params }) {
   const [steps, setSteps] = useState(0);
@@ -158,15 +167,8 @@ export default function Page({ params }) {
 
   const SERVICE_CHARGE = 2;
 
-  const calculateTotalPrice = () => {
-    let calculatedTotalPrice = 0;
-    selectedService.forEach((data) => {
-      calculatedTotalPrice += parseFloat(data?.price) * Vehicle.length;
-    });
-    SetPrice(calculatedTotalPrice);
-  };
   useEffect(() => {
-    calculateTotalPrice();
+    SetPrice(computeServiceTotal(selectedService, Vehicle.length));
   }, [selectedService, Vehicle]);
 
   const addCar = () => {
@@ -182,12 +184,24 @@ export default function Page({ params }) {
   };
 
   const onPanelChange = (value) => {
+    if (value.isBefore(dayjs(), "day")) {
+      toast.error("Cannot select a past date.");
+      return;
+    }
     setBookingDate(value.format("YYYY-MM-DD"));
+  };
+
+  const disabledDate = (current) => {
+    return current && current.isBefore(dayjs().startOf("day"));
   };
   const router = useRouter();
 
   // POST booking
   const BookHandler = async () => {
+    if (!Data || !Data._id) {
+      toast.error("Store data is not loaded. Please refresh the page.");
+      return;
+    }
     if (Vehicle.length === 0) {
       toast.error("Please add at least one vehicle.");
       return;
@@ -196,8 +210,9 @@ export default function Page({ params }) {
       toast.error("Please select at least one service.");
       return;
     }
-    if (!zipcode || !street) {
-      toast.error("Please enter your address before booking.");
+    const trimmedStreet = street.trim();
+    if (!zipcode || !zipcode.city || !zipcode.state || !zipcode.postal_code || !trimmedStreet) {
+      toast.error("Please enter a valid address before booking.");
       return;
     }
     if (!bookingDate) {
@@ -208,18 +223,42 @@ export default function Page({ params }) {
       toast.error("Please select a booking time.");
       return;
     }
+    // Recompute total price at submit time to avoid stale state
+    const finalPrice = computeServiceTotal(selectedService, Vehicle.length) + SERVICE_CHARGE;
+
+    // Normalize payload — strip extra fields to send only what the backend needs
+    const normalizedVehicle = Vehicle.map(({ Year, Make, Model, Engine }) => ({
+      Year,
+      Make,
+      Model,
+      Engine,
+    }));
+
+    const normalizedServices = selectedService.map(({ _id, service, price }) => ({
+      _id,
+      service,
+      price: parseFloat(price) || 0,
+    }));
+
+    const normalizedLocation = {
+      city: zipcode.city,
+      state: zipcode.state,
+      postal_code: zipcode.postal_code,
+      country_code: zipcode.country_code,
+    };
+
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
       await api.post(`/Book/CreateBooking`, {
-        TotalPrice: price + SERVICE_CHARGE,
-        Vehicle,
+        TotalPrice: finalPrice,
+        Vehicle: normalizedVehicle,
         Date: bookingDate,
         Time,
-        selectedService,
-        Location: zipcode,
-        apt,
-        street,
+        selectedService: normalizedServices,
+        Location: normalizedLocation,
+        apt: apt.trim(),
+        street: trimmedStreet,
         storeId: Data._id,
       });
       setBookingDone(true);
@@ -232,7 +271,12 @@ export default function Page({ params }) {
 
   return (
     <div>
-      {bookingDone ? (
+      {!Data ? (
+        <div className="mx-40 mt-40 max-sm:mx-5 text-center">
+          <Spin size="large" />
+          <p className="mt-4 text-gray-500">Loading store data...</p>
+        </div>
+      ) : bookingDone ? (
         <div className="mx-40 mt-40 max-sm:mx-5">
           <Loader />
           <button
@@ -651,7 +695,7 @@ export default function Page({ params }) {
                       </div>
                     </div>
                     <div className="h-96 overflow-scroll mt-10">
-                      <Calendar onChange={onPanelChange} />
+                      <Calendar onChange={onPanelChange} disabledDate={disabledDate} />
                     </div>
                   </div>
                 </div>
@@ -742,7 +786,7 @@ export default function Page({ params }) {
                     toast.error("Please add at least one vehicle before continuing.");
                     return;
                   }
-                  if (!zipcode || !street) {
+                  if (!zipcode || !zipcode.city || !zipcode.state || !zipcode.postal_code || !street.trim()) {
                     toast.error("Please enter your address (zip code and street) before continuing.");
                     return;
                   }
