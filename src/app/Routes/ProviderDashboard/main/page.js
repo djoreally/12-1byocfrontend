@@ -27,7 +27,7 @@ export default function page() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await api.get("subscribe/subscriptions");
+        const response = await api.get("/subscribe/subscriptions");
         setPaymentData(response?.data?.subscriptions);
       } catch (error) {
         console.log(error);

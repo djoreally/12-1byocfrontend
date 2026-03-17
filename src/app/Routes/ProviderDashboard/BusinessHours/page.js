@@ -51,7 +51,7 @@ export default function page() {
   const {data} = useDataContext();
   console.log(data?.ServiceHours?.length)
   useEffect(() => {
-    if (data.ServiceHours?.length > 0) {
+    if (data?.ServiceHours?.length > 0) {
       setWeekData(data.ServiceHours);
     }
   }, [data]);
