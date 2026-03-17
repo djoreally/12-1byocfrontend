@@ -84,7 +84,7 @@ The `BookHandler` function (line ~200) constructs and sends the payload to `POST
 | `Vehicle`          | `Vehicle` state      | Objects from `csvjson.json` filtered by Year/Make/Model/Engine | ✅ Yes — normalized to `{Year, Make, Model, Engine}` only | Raw CSV objects had 13+ extra fields (Engine Oil, Oil Capacity, Oil Plug Torque, etc.) that are now stripped |
 | `Date`             | `bookingDate` state  | `value.format("YYYY-MM-DD")` via Ant Design Calendar `onChange` | ❌ No transform — passed as-is | String format "YYYY-MM-DD" |
 | `Time`             | `Time` state         | `data.from` from `Data.ServiceHours` via Select component | ❌ No transform — passed as-is | Only the `from` value, not the full time range object |
-| `selectedService`  | `selectedService` state | Full service objects from `Data.Services` (fetched from store API) | ✅ Yes — normalized to `{_id, service, price}` only | Raw objects had extra fields like `serviceDescription` |
+| `selectedService`  | `selectedService` state | Full service objects from `Data.Services` (fetched from store API) | ✅ Yes — normalized to `{_id, service, price}` with `price` parsed to Number | Raw objects had extra fields like `serviceDescription`; `price` was string |
 | `Location`         | `zipcode` state      | `response.data.results[codes][0]` from `POST /OuterApi/zipcode` | ✅ Yes — normalized to `{city, state, postal_code, country_code}` | Raw API response may have had additional fields from external zipcode service |
 | `apt`              | `apt` state          | User text input in address modal                          | ✅ Yes — `.trim()` applied at submit | Optional field |
 | `street`           | `street` state       | User text input in address modal                          | ✅ Yes — `.trim()` applied at submit, checked for empty after trim | Required field |
@@ -101,7 +101,7 @@ The `BookHandler` function (line ~200) constructs and sends the payload to `POST
   "Date": "2026-03-20",
   "Time": "9:00 AM",
   "selectedService": [
-    { "_id": "abc123", "service": "Oil Change", "price": "20" }
+    { "_id": "abc123", "service": "Oil Change", "price": 20 }
   ],
   "Location": {
     "city": "Springfield",
@@ -122,7 +122,7 @@ The `BookHandler` function (line ~200) constructs and sends the payload to `POST
 | `Data` and `Data._id` non-null | ✅ | Guards against store fetch failure |
 | `Vehicle.length > 0` | ✅ | At least one vehicle required |
 | `selectedService.length > 0` | ✅ | At least one service required |
-| `zipcode.city` and `zipcode.state` non-empty | ✅ | Zipcode is a resolved object |
+| `zipcode.city`, `zipcode.state`, and `zipcode.postal_code` non-empty | ✅ | Zipcode is a resolved object with required fields |
 | `street` non-empty (after trim) | ✅ | Whitespace-only strings rejected |
 | `bookingDate` is set | ✅ | Cannot be undefined |
 | `Time` is set | ✅ | Cannot be undefined |
@@ -163,7 +163,7 @@ The `BookHandler` function (line ~200) constructs and sends the payload to `POST
 | Risk | Details | Recommendation |
 |------|---------|----------------|
 | **`selectedService` naming** | Frontend sends `selectedService` (camelCase). If backend expects `services` or `Services`, the field will be silently ignored. | Confirm backend schema field name |
-| **`price` is a string in service data** | Service `price` values from the store API may be strings (e.g. `"20"` not `20`). The normalized payload preserves this type. Backend may expect Number. | Consider `parseFloat(price)` in normalization |
+| **`price` is now a Number** | Service `price` values are parsed to Number via `parseFloat(price) \|\| 0` in the normalized payload | ✅ Fixed |
 | **`Vehicle` has PascalCase keys** | Vehicle objects use `{Year, Make, Model, Engine}` (PascalCase from CSV). Backend may expect camelCase `{year, make, model, engine}`. | Confirm backend schema casing |
 | **`Engine` is a float** | Engine values come from CSV as numbers (e.g. `2.4`, `3.5`). Backend may expect string. | Confirm backend type |
 | **`TotalPrice` is client-computed** | Price is computed client-side and trusted by the backend. A malicious client can send any value. | Backend should recompute from service IDs |

@@ -40,6 +40,14 @@ import Loader from "@/app/Components/Loader";
 import { useRouter } from "next/navigation";
 import cars from "./csvjson.json";
 
+const computeServiceTotal = (services, vehicleCount) => {
+  let total = 0;
+  services.forEach((data) => {
+    total += (parseFloat(data?.price) || 0) * vehicleCount;
+  });
+  return total;
+};
+
 export default function Page({ params }) {
   const [steps, setSteps] = useState(0);
   const [Data, setData] = useState(null);
@@ -159,14 +167,6 @@ export default function Page({ params }) {
 
   const SERVICE_CHARGE = 2;
 
-  const computeServiceTotal = (services, vehicleCount) => {
-    let total = 0;
-    services.forEach((data) => {
-      total += (parseFloat(data?.price) || 0) * vehicleCount;
-    });
-    return total;
-  };
-
   useEffect(() => {
     SetPrice(computeServiceTotal(selectedService, Vehicle.length));
   }, [selectedService, Vehicle]);
@@ -211,7 +211,7 @@ export default function Page({ params }) {
       return;
     }
     const trimmedStreet = street.trim();
-    if (!zipcode || !zipcode.city || !zipcode.state || !trimmedStreet) {
+    if (!zipcode || !zipcode.city || !zipcode.state || !zipcode.postal_code || !trimmedStreet) {
       toast.error("Please enter a valid address before booking.");
       return;
     }
@@ -237,7 +237,7 @@ export default function Page({ params }) {
     const normalizedServices = selectedService.map(({ _id, service, price }) => ({
       _id,
       service,
-      price,
+      price: parseFloat(price) || 0,
     }));
 
     const normalizedLocation = {
@@ -786,7 +786,7 @@ export default function Page({ params }) {
                     toast.error("Please add at least one vehicle before continuing.");
                     return;
                   }
-                  if (!zipcode || !zipcode.city || !zipcode.state || !street) {
+                  if (!zipcode || !zipcode.city || !zipcode.state || !zipcode.postal_code || !street.trim()) {
                     toast.error("Please enter your address (zip code and street) before continuing.");
                     return;
                   }
