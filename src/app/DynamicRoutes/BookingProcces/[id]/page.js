@@ -4,7 +4,8 @@
  * @returns The code is returning a React functional component named "Page".
  */
 "use client";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { Steps, Spin, Input, Modal } from "antd";
 import { Accordion } from "flowbite-react";
 import {
@@ -68,9 +69,8 @@ export default function Page({ params }) {
         const response = await api.get(`/store/GetStore/${params.id}`);
         const data = response.data.data;
         setData(data);
-        const cars = await api.get("/OuterApi/cars");
       } catch (error) {
-        console.log(error.message);
+        toast.error("Failed to load store data. Please refresh the page.");
       }
     };
 
@@ -82,10 +82,10 @@ export default function Page({ params }) {
 
   const handleCancel = () => {
     setOpen(false);
-    setCodes();
-    setStreeet();
-    setZipcode();
-    setApt();
+    setCodes("");
+    setStreeet("");
+    setZipcode(null);
+    setApt("");
   };
   const showModal = () => {
     setOpen(true);
@@ -96,14 +96,19 @@ export default function Page({ params }) {
   }, [codes]);
 
   const fetchZipcode = async () => {
+    if (!codes) return;
     try {
       const response = await api.post("/OuterApi/zipcode", {
         codes,
       });
-      // console.log(response.data.results);
-      setZipcode(response.data.results[codes][0]);
+      const result = response.data?.results?.[codes]?.[0];
+      if (result) {
+        setZipcode(result);
+      } else {
+        toast.error("No location found for that zip code.");
+      }
     } catch (error) {
-      console.log(error.message);
+      toast.error("Could not validate zip code. Please try again.");
     }
   };
 
@@ -117,13 +122,33 @@ export default function Page({ params }) {
       const YourVehicle = FilterByModel.filter(
         (item) => item?.Engine === engine
       );
-      setVehicle((prevVehicle) => [...prevVehicle, ...YourVehicle]);
+      // Prevent adding a vehicle that is already in the list
+      setVehicle((prevVehicle) => {
+        const existingKeys = new Set(
+          prevVehicle.map((v) => `${v.Year}-${v.Make}-${v.Model}-${v.Engine}`)
+        );
+        const newVehicles = YourVehicle.filter(
+          (v) => !existingKeys.has(`${v.Year}-${v.Make}-${v.Model}-${v.Engine}`)
+        );
+        if (newVehicles.length === 0) {
+          toast.error("This vehicle has already been added.");
+          return prevVehicle;
+        }
+        return [...prevVehicle, ...newVehicles];
+      });
     }
   };
 
   // set data to selected service
   const setServiceToState = (data) => {
-    setSelectedService((prevServices) => [...prevServices, data]);
+    setSelectedService((prevServices) => {
+      const alreadyAdded = prevServices.some((s) => s._id === data._id || s.service === data.service);
+      if (alreadyAdded) {
+        toast.error("This service has already been added.");
+        return prevServices;
+      }
+      return [...prevServices, data];
+    });
   };
 
   const calculateTotalPrice = () => {
@@ -138,11 +163,15 @@ export default function Page({ params }) {
   }, [selectedService]);
 
   const addCar = () => {
-    setMake();
-    setYear();
-    setEngine();
-    setModel();
+    if (!year || !make || !model || !engine) {
+      toast.error("Please select Year, Make, Model, and Engine before adding a vehicle.");
+      return;
+    }
     setVehicleDataToState();
+    setMake("");
+    setYear("");
+    setEngine("");
+    setModel("");
   };
 
   const onPanelChange = (value) => {
@@ -152,9 +181,17 @@ export default function Page({ params }) {
 
   // POST booking
   const BookHandler = async () => {
+    if (!Date) {
+      toast.error("Please select a booking date.");
+      return;
+    }
+    if (!Time) {
+      toast.error("Please select a booking time.");
+      return;
+    }
     try {
-      const response = await api.post(`/Book/CreateBooking`, {
-        TotalPrice: price,
+      await api.post(`/Book/CreateBooking`, {
+        TotalPrice: price + 2, // +2 is the flat service/processing charge shown in the cart summary
         Vehicle,
         Date,
         Time,
@@ -166,7 +203,7 @@ export default function Page({ params }) {
       });
       setBookingDone(true);
     } catch (error) {
-      console.log(error.message);
+      toast.error("Failed to create booking. Please try again.");
     }
   };
 
@@ -671,7 +708,25 @@ export default function Page({ params }) {
             </button>
           ) : (
             <button
-              onClick={() => setSteps((previous) => previous + 1)}
+              onClick={() => {
+                if (steps === 0) {
+                  if (Vehicle.length === 0) {
+                    toast.error("Please add at least one vehicle before continuing.");
+                    return;
+                  }
+                  if (!zipcode || !street) {
+                    toast.error("Please enter your address (zip code and street) before continuing.");
+                    return;
+                  }
+                }
+                if (steps === 1) {
+                  if (selectedService.length === 0) {
+                    toast.error("Please select at least one service before continuing.");
+                    return;
+                  }
+                }
+                setSteps((previous) => previous + 1);
+              }}
               className="px-4 py-3 bg-blue-500 font-semibold text-white text-sm uppercase rounded-full w-[50%] m-auto block mt-5"
             >
               Continue next

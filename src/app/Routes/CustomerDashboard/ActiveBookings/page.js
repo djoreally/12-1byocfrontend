@@ -22,8 +22,6 @@ export default function page() {
     background: "#eef2f5",
   };
 
-  console.log(data?.Bookings);
-
   return (
     <div className="mt-10 max-sm:mx-5">
       <p className="mt-6 text-xl text-gray-900 capitalize font-semibold flex items-center gap-1">
