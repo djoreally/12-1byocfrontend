@@ -57,10 +57,11 @@ export default function Page({ params }) {
   // this data will sent to backend
   const [Vehicle, setVehicle] = useState([]);
   const [selectedService, setSelectedService] = useState([]);
-  const [Date, setDate] = useState();
+  const [bookingDate, setBookingDate] = useState();
   const [Time, setTime] = useState();
   const [zipcode, setZipcode] = useState("");
-  const [price, SetPrice] = useState();
+  const [price, SetPrice] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   //  GET STORE DATA
   useEffect(() => {
@@ -75,7 +76,7 @@ export default function Page({ params }) {
     };
 
     fetchData();
-  }, []);
+  }, [params.id]);
   const handleOk = () => {
     setOpen(false);
   };
@@ -84,7 +85,7 @@ export default function Page({ params }) {
     setOpen(false);
     setCodes("");
     setStreeet("");
-    setZipcode(null);
+    setZipcode("");
     setApt("");
   };
   const showModal = () => {
@@ -92,7 +93,11 @@ export default function Page({ params }) {
   };
 
   useEffect(() => {
-    fetchZipcode();
+    if (!codes) return;
+    const debounceTimer = setTimeout(() => {
+      fetchZipcode();
+    }, 500);
+    return () => clearTimeout(debounceTimer);
   }, [codes]);
 
   const fetchZipcode = async () => {
@@ -151,6 +156,8 @@ export default function Page({ params }) {
     });
   };
 
+  const SERVICE_CHARGE = 2;
+
   const calculateTotalPrice = () => {
     let calculatedTotalPrice = 0;
     selectedService.forEach((data) => {
@@ -160,7 +167,7 @@ export default function Page({ params }) {
   };
   useEffect(() => {
     calculateTotalPrice();
-  }, [selectedService]);
+  }, [selectedService, Vehicle]);
 
   const addCar = () => {
     if (!year || !make || !model || !engine) {
@@ -175,13 +182,25 @@ export default function Page({ params }) {
   };
 
   const onPanelChange = (value) => {
-    setDate(value.format("YYYY-MM-DD"));
+    setBookingDate(value.format("YYYY-MM-DD"));
   };
   const router = useRouter();
 
   // POST booking
   const BookHandler = async () => {
-    if (!Date) {
+    if (Vehicle.length === 0) {
+      toast.error("Please add at least one vehicle.");
+      return;
+    }
+    if (selectedService.length === 0) {
+      toast.error("Please select at least one service.");
+      return;
+    }
+    if (!zipcode || !street) {
+      toast.error("Please enter your address before booking.");
+      return;
+    }
+    if (!bookingDate) {
       toast.error("Please select a booking date.");
       return;
     }
@@ -189,11 +208,13 @@ export default function Page({ params }) {
       toast.error("Please select a booking time.");
       return;
     }
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       await api.post(`/Book/CreateBooking`, {
-        TotalPrice: price + 2, // +2 is the flat service/processing charge shown in the cart summary
+        TotalPrice: price + SERVICE_CHARGE,
         Vehicle,
-        Date,
+        Date: bookingDate,
         Time,
         selectedService,
         Location: zipcode,
@@ -204,6 +225,8 @@ export default function Page({ params }) {
       setBookingDone(true);
     } catch (error) {
       toast.error("Failed to create booking. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -228,6 +251,7 @@ export default function Page({ params }) {
               footer={[
                 <button
                   className="bg-blue-400 px-3 rounded-lg py-1 text-white mx-1"
+                  key="save"
                   onClick={handleOk}
                 >
                   save
@@ -456,8 +480,8 @@ export default function Page({ params }) {
               ) : steps === 1 ? (
                 <div className="grid grid-cols-2 gap-20 max-sm:gap-2 col-span-2 p-4 h-[90vh] max-sm:h-full overflow-scroll max-sm:grid-cols-1 max-sm:col-span-1">
                   {Data?.Services?.map((data, index) => (
-                    <div className="shadow p-4 h-[15rem] rounded-lg bg-white flex flex-col justify-between items-start ">
-                      <div key={index} className="">
+                    <div key={index} className="shadow p-4 h-[15rem] rounded-lg bg-white flex flex-col justify-between items-start ">
+                      <div className="">
                         <p className="text-lg font-semibold flex items-start gap-1">
                           <AiFillShop className="text-blue-400 w-7 h-7" />
                           {data?.service}
@@ -496,9 +520,12 @@ export default function Page({ params }) {
                   ))}
                 </div>
               ) : steps === 2 ? (
-                <div>
-                  <p className="text-center mt-20 text-4xl font-bold">
-                    Payment API will add here{" "}
+                <div className="p-4 bg-white rounded-lg mt-10">
+                  <p className="text-center text-xl font-bold text-gray-600">
+                    Review your order and proceed to confirm
+                  </p>
+                  <p className="text-center text-sm text-gray-400 mt-2">
+                    Payment will be collected by the service provider
                   </p>
                 </div>
               ) : (
@@ -586,7 +613,7 @@ export default function Page({ params }) {
                             d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z"
                           />
                         </svg>
-                        {Date}
+                        {bookingDate}
                       </p>
                       <div className="flex items-center">
                         <p className="flex items-center ">
@@ -655,7 +682,7 @@ export default function Page({ params }) {
                     </div>
 
                     {selectedService.map((data, index) => (
-                      <div className="">
+                      <div key={index} className="">
                         <div className="flex justify-between ">
                           <p className="text-sm my-1">{data?.service}</p>
                           <p className="text-sm font-semibold my-1">
@@ -674,12 +701,12 @@ export default function Page({ params }) {
                     </div>
                     <div className="flex justify-between uppercase font-semibold text-sm   mt- px-2 py-2 rounded-sm ">
                       <p>Service Charge</p>
-                      <p>+2$</p>
+                      <p>+{SERVICE_CHARGE}$</p>
                     </div>
                     <div className="w-full h-[1px] bg-gray-800"></div>
                     <div className="flex justify-between uppercase font-semibold text-sm   mt- px-2 py-2 rounded-sm mb-5">
                       <p>total</p>
-                      <p>{price + 2}$</p>
+                      <p>{price + SERVICE_CHARGE}$</p>
                     </div>
                   </div>
                 </div>
@@ -702,9 +729,10 @@ export default function Page({ params }) {
           {steps > 2 ? (
             <button
               onClick={BookHandler}
-              className="px-4 py-3 bg-blue-500 font-semibold text-white text-sm uppercase rounded-full w-[50%] m-auto block mt-5"
+              disabled={isSubmitting}
+              className="px-4 py-3 bg-blue-500 font-semibold text-white text-sm uppercase rounded-full w-[50%] m-auto block mt-5 disabled:opacity-50"
             >
-              Book now
+              {isSubmitting ? "Booking..." : "Book now"}
             </button>
           ) : (
             <button

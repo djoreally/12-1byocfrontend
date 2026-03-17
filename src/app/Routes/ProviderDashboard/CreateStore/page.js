@@ -90,6 +90,10 @@ export default function page() {
   };
 
   const handleFormSubmit = async (e) => {
+    if (!storename || !description) {
+      toast.error("Store name and description are required.");
+      return;
+    }
     const formData = new FormData();
     formData.append("StoreName", storename);
     formData.append("Description", description);
@@ -112,9 +116,13 @@ export default function page() {
         }
       );
       toast.success("Your Store updated successfully");
-      setLoading(false);
+      return true;
     } catch (error) {
-      toast.error(error.response.data.message);
+      const message = error?.response?.data?.message || "Failed to save store. Please try again.";
+      toast.error(message);
+      return false;
+    } finally {
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -125,7 +133,6 @@ export default function page() {
           const decoded = jwtDecode(Token);
           const response = await api.get(`/store/GetStore/${decoded.userId}`);
           const data = response.data.data;
-          console.log(data.Services);
           setPreviewThumbnail(data?.Thumbnail);
           setPreviewLogo(data?.Logo);
           setResData(data?.user);
@@ -137,7 +144,7 @@ export default function page() {
           setServices(data?.Services);
         }
       } catch (error) {
-        console.log(error.message);
+        // Failed to load existing store data – form starts empty
       }
     };
 
@@ -192,9 +199,9 @@ export default function page() {
 
       <div className="mt-5 flex justify-between max-sm:">
         <button
-          onClick={() => {
-            handleFormSubmit();
-            router.push(`/DynamicRoutes/Store/${resData}`);
+          onClick={async () => {
+            const success = await handleFormSubmit();
+            if (success) router.push(`/DynamicRoutes/Store/${resData}`);
           }}
           className="px-8 py-3 max-sm:px-3 max-sm:py-3 max-sm:text-sm text-blue-400 hover:bg-blue-200 rounded-xl border border-blue-400 font-semibold flex items-center gap-2"
         >
@@ -215,9 +222,9 @@ export default function page() {
           Save and preview
         </button>
         <button
-          onClick={() => {
-            handleFormSubmit();
-            router.push(`main`);
+          onClick={async () => {
+            const success = await handleFormSubmit();
+            if (success) router.push(`main`);
           }}
           className="px-8 py-3 max-sm:px-3 max-sm:py-3 max-sm:text-sm text-blue-100 hover:bg-blue-200 rounded-xl border bg-blue-400 font-semibold flex items-center gap-2"
         >
