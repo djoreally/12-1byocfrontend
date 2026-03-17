@@ -159,16 +159,16 @@ export default function Page({ params }) {
 
   const SERVICE_CHARGE = 2;
 
-  const calculateTotalPrice = () => {
-    let calculatedTotalPrice = 0;
-    selectedService.forEach((data) => {
-      const servicePrice = parseFloat(data?.price) || 0;
-      calculatedTotalPrice += servicePrice * Vehicle.length;
+  const computeServiceTotal = (services, vehicleCount) => {
+    let total = 0;
+    services.forEach((data) => {
+      total += (parseFloat(data?.price) || 0) * vehicleCount;
     });
-    SetPrice(calculatedTotalPrice);
+    return total;
   };
+
   useEffect(() => {
-    calculateTotalPrice();
+    SetPrice(computeServiceTotal(selectedService, Vehicle.length));
   }, [selectedService, Vehicle]);
 
   const addCar = () => {
@@ -223,11 +223,7 @@ export default function Page({ params }) {
       return;
     }
     // Recompute total price at submit time to avoid stale state
-    let freshTotal = 0;
-    selectedService.forEach((s) => {
-      freshTotal += (parseFloat(s?.price) || 0) * Vehicle.length;
-    });
-    const finalPrice = freshTotal + SERVICE_CHARGE;
+    const finalPrice = computeServiceTotal(selectedService, Vehicle.length) + SERVICE_CHARGE;
 
     if (isSubmitting) return;
     setIsSubmitting(true);
