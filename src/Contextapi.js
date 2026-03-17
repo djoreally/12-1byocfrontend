@@ -10,7 +10,7 @@ export const useDataContext = () => {
 };
 
 export const DataProvider = ({ children }) => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState(null);
   const [open, setOpen] = useState(false); // New state for open and setOpen
 
   useEffect(() => {

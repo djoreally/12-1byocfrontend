@@ -28,9 +28,8 @@ export default function page({ params }) {
     if (Token) {
       const decoded = jwtDecode(Token);
       setName(decoded?.name);
-    } else {
     }
-  });
+  }, []);
 
   const [Data, setData] = useState(null);
   useEffect(() => {
@@ -49,7 +48,7 @@ export default function page({ params }) {
   }, []);
   const serviceAreas = Data?.ServiceArea?.split(",");
   const Tags = Data?.Tags?.split(",");
-  Data?.ServiceHours.map((data, index) => {
+  Data?.ServiceHours?.map((data, index) => {
     console.log(data.from);
   });
   return (
@@ -128,7 +127,7 @@ export default function page({ params }) {
               <div className="mt-10 p-8 max-sm:p-2">
                 <p className="text-xl font-semibold">Our Services </p>
                 <div className="grid grid-cols-2 gap-2 max-sm:grid-cols-1 ">
-                  {Data?.Services.map((data, index) => {
+                  {Data?.Services?.map((data, index) => {
                     return (
                       <div key={index}>
                         <div className="bg-white shadow-sm outline outline-gray-50 p-6 m-2 rounded-sm h-60">
@@ -209,7 +208,7 @@ export default function page({ params }) {
                 <p className="text-center font-semibold capitalize">
                   business hour{" "}
                 </p>
-                {Data?.ServiceHours.map((data, index) => (
+                {Data?.ServiceHours?.map((data, index) => (
                   <div key={index}>
                     <hr />
 
