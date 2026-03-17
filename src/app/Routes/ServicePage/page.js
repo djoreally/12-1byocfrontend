@@ -22,7 +22,7 @@ export default function page() {
         const data = response.data.data;
         setData(data);
       } catch (error) {
-        console.log(error.message);
+        console.log(error?.message);
       }
     };
 
@@ -46,8 +46,8 @@ export default function page() {
   };
 
   useEffect(() => {
-    const filteredData = Data?.filter((Data) =>
-      Data.ServiceArea.includes(zipcode)
+    const filteredData = Data?.filter((item) =>
+      item?.ServiceArea?.includes(zipcode)
     );
     setFilteredStores(filteredData);
   }, [Data, zipcode]);
