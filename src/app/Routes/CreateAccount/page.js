@@ -23,34 +23,56 @@ import { SocialIcon } from "react-social-icons";
 
 export default function page() {
   // state for handling form
-  const [name, setName] = useState(null);
-  const [email, setEmail] = useState(null);
-  const [phone, setPhone] = useState(null);
-  const [password, setPassword] = useState(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
   const [isSuccessful, setSuccesful] = useState(false);
   const [role, setRole] = useState("customer");
   const router = useRouter();
   const [validatorErrors, setValidatorErrors] = useState({
+    name: "",
     email: "",
+    phone: "",
     password: "",
   });
 
   //  form field validator
   const FormValidationHandler = () => {
-    const newErrors = { email: "", password: "" };
+    const newErrors = { name: "", email: "", phone: "", password: "" };
+    let isValid = true;
+
+    if (!name || name.trim().length < 2) {
+      newErrors.name = "Name is required (at least 2 characters)";
+      isValid = false;
+    }
 
     if (!email) {
       newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Please enter a valid email address";
+      isValid = false;
+    }
+
+    if (!phone) {
+      newErrors.phone = "Phone number is required";
+      isValid = false;
     }
 
     if (!password || password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
+      isValid = false;
     }
 
     setValidatorErrors(newErrors);
+    return isValid;
   };
   //  submit form in backend
   const SubmitHandler = async () => {
+    if (!FormValidationHandler()) {
+      return;
+    }
     try {
       const response = await api.post("/auth/signup", {
         name,
@@ -59,13 +81,11 @@ export default function page() {
         password,
         role,
       });
-      setValidatorErrors("");
+      setValidatorErrors({ name: "", email: "", phone: "", password: "" });
       setSuccesful(true);
-      console.log(response);
     } catch (error) {
-      console.log("Error:", error.response.data.message);
-      toast.error(error.response.data.message);
-      FormValidationHandler();
+      const message = error?.response?.data?.message || "Registration failed. Please try again.";
+      toast.error(message);
     }
   };
 
@@ -101,9 +121,14 @@ export default function page() {
               </h1>
               {/* name input and text */}
               <div className=" flex items-center mt-10 justify-between">
-                <p className="text-[#7C7C8A] text-lg capitalize w-fit px-2 rounded-sm">
-                  Enter your full name
-                </p>
+                <div>
+                  <p className="text-[#7C7C8A] text-lg capitalize w-fit px-2 rounded-sm">
+                    Enter your full name
+                  </p>
+                  {validatorErrors.name && (
+                    <p style={{ color: "red" }}>{validatorErrors.name}</p>
+                  )}
+                </div>
               </div>
               <input
                 type="text"
@@ -154,6 +179,25 @@ export default function page() {
                 prefix={<KeyOutlined />}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+              />
+              <div className=" flex items-center  justify-between">
+                <div>
+                  <p className="text-[#7C7C8A] text-lg capitalize w-fit px-2 rounded-sm">
+                    Enter your phone number
+                  </p>
+                  {validatorErrors.phone && (
+                    <p style={{ color: "red" }}>{validatorErrors.phone}</p>
+                  )}
+                </div>
+              </div>
+              <input
+                type="tel"
+                className="mb-6 w-full  forminput"
+                size="large"
+                placeholder="Enter your phone number"
+                prefix={<PhoneOutlined />}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
               {/* Sign upaction button */}
               <button

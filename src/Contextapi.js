@@ -11,7 +11,8 @@ export const useDataContext = () => {
 
 export const DataProvider = ({ children }) => {
   const [data, setData] = useState(null);
-  const [open, setOpen] = useState(false); // New state for open and setOpen
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProvderData = async () => {
@@ -24,7 +25,9 @@ export const DataProvider = ({ children }) => {
           setData(data);
         }
       } catch (error) {
-        console.log(error.message);
+        // Silently handle – data stays null
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -37,7 +40,9 @@ export const DataProvider = ({ children }) => {
           setData(data);
         }
       } catch (error) {
-        console.log(error?.response?.data);
+        // Silently handle – data stays null
+      } finally {
+        setLoading(false);
       }
     };
     const Token = Cookies.get("token");
@@ -49,6 +54,8 @@ export const DataProvider = ({ children }) => {
       } else   {
         fetchUserData();
       }
+    } else {
+      setLoading(false);
     }
   }, []);
 
@@ -56,6 +63,7 @@ export const DataProvider = ({ children }) => {
     data,
     open,
     setOpen,
+    loading,
   };
 
   return (

@@ -40,7 +40,7 @@ export default function page({ params }) {
         setData(data);
         setLoading(false);
       } catch (error) {
-        console.log(error.message);
+        setLoading(false);
       }
     };
 
@@ -48,9 +48,6 @@ export default function page({ params }) {
   }, []);
   const serviceAreas = Data?.ServiceArea?.split(",");
   const Tags = Data?.Tags?.split(",");
-  Data?.ServiceHours?.map((data, index) => {
-    console.log(data.from);
-  });
   return (
     <div>
       <Navbar />

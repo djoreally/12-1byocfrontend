@@ -29,6 +29,10 @@ export default function page() {
   };
 
   const SubmitHandler = async () => {
+    if (!email || !password) {
+      openNotification("top");
+      return;
+    }
     try {
       const response = await api.post("/auth/login", {
         email,
@@ -48,7 +52,6 @@ export default function page() {
         }, 1500);
       }
     } catch (error) {
-      console.log(error);
       openNotification("top");
     }
   };
